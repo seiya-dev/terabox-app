@@ -66,7 +66,18 @@ class Args {
                         type: 'boolean',
                     };
                     break;
+                
+                // reserved
                 case 'clouddl-mode':
+                    yargsOpts[a] = {};
+                    break;
+                case 't':
+                    yargsOpts[a] = {};
+                    break;
+                case 'i':
+                    yargsOpts[a] = {};
+                    break;
+                case 'qs':
                     yargsOpts[a] = {};
                     break;
             }
