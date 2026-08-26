@@ -116,7 +116,7 @@ async function startApiSequence(){
     
     if(mode == 'add'){
         const remFiles = await app.search('.torrent');
-        const torrents = remFiles.list.filter(f => f.isdir === 0 && f.category === 6 && f.path?.toLowerCase().endsWith('.torrent'));
+        const torrents = remFiles.list.filter(f => f.isdir === 0 && [6, 7].includes(f.category)  && f.path?.toLowerCase().endsWith('.torrent'));
         
         torrents.sort((a, b) => {
             if (a.path < b.path) return -1;
@@ -187,6 +187,7 @@ async function collectTasks(is_all = false){
 
 async function createTask(upfld, src){
     const rUpload1 = await app.clouddl_query_sinfo(upfld + src);
+    
     const idxList = [
         { name: 'all files', value: '0' },
     ];
@@ -220,6 +221,10 @@ async function createTask(upfld, src){
             const rUpload2 = await app.clouddl_add_task(upfld + src, rUpload1.torrent_info.sha1, selFiles, upfld);
             console.log(rUpload2);
         }
+    }
+    
+    if(rUpload1.error_code){
+        console.log(`[ERROR] CODE#${rUpload1.error_code}: ${rUpload1.error_msg}`);
     }
 }
 
