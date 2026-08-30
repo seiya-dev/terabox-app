@@ -194,8 +194,10 @@ async function createTask(upfld, src){
     
     if(rUpload1.torrent_info){
         for (const [index, value] of rUpload1.torrent_info.file_info.entries()) {
-            idxList.push({ name: String(index+1).padStart(3) + ': ' + value.file_name + ` (${fb2str(Number(value.size))})`, value: String(index+1) });
+            idxList.push({ name: String(index+1).padStart(3) + ': ' + value.file_name + ` (${fb2str(Number(value.size))})`, file_name: value.file_name, value: String(index+1) });
         }
+        
+        idxList.sort((a, b) => a.file_name.localeCompare(b.file_name));
         
         let selIdx = yargs.getArgv('idx') ? yargs.getArgv('idx').split(",").map(v => String(Number(v.trim()))) : [];
         selIdx = idxList.filter(item => selIdx.includes(item.value))
