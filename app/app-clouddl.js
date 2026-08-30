@@ -189,15 +189,35 @@ async function createTask(upfld, src){
     const rUpload1 = await app.clouddl_query_sinfo(upfld + src);
     
     const idxList = [
-        { name: 'all files', value: '0' },
+        { name: 'all files', filename: '', value: '0' },
     ];
     
     if(rUpload1.torrent_info){
         for (const [index, value] of rUpload1.torrent_info.file_info.entries()) {
-            idxList.push({ name: String(index+1).padStart(3) + ': ' + value.file_name + ` (${fb2str(Number(value.size))})`, file_name: value.file_name, value: String(index+1) });
+            idxList.push({ name: String(index+1).padStart(3) + ': ' + value.file_name + ` (${fb2str(Number(value.size))})`, filename: value.file_name, value: String(index+1) });
         }
         
-        idxList.sort((a, b) => a.file_name.localeCompare(b.file_name));
+        idxList.sort((a, b) => {
+            const ap = a.filename.split("/").filter(Boolean);
+            const bp = b.filename.split("/").filter(Boolean);
+            
+            for (let i = 0; i < Math.min(ap.length, bp.length); i++) {
+                if (ap[i] === bp[i]) continue;
+                const aIsDirectory = i < ap.length - 1;
+                const bIsDirectory = i < bp.length - 1;
+                
+                if (aIsDirectory !== bIsDirectory) {
+                    return aIsDirectory ? -1 : 1;
+                }
+                
+                return ap[i].localeCompare(bp[i], undefined, {
+                    numeric: true,
+                    sensitivity: "base",
+                });
+            }
+            
+            return ap.length - bp.length;
+        });
         
         let selIdx = yargs.getArgv('idx') ? yargs.getArgv('idx').split(",").map(v => String(Number(v.trim()))) : [];
         selIdx = idxList.filter(item => selIdx.includes(item.value))
